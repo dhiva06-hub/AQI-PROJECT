@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { ApiError } = require('../middleware/errorHandler');
 const { isConnected } = require('../config/db');
-const memoryStore = require('../services/inMemoryStore');
 
 function signToken(user) {
   return jwt.sign(
@@ -28,13 +27,9 @@ async function register(req, res, next) {
     }
 
     if (!isConnected()) {
-      const existing = await memoryStore.findUserByEmail(email);
-      if (existing) throw new ApiError(409, 'An account with that email already exists');
-      const user = await memoryStore.createUser({ name, email, password });
-      const token = signToken(user);
-      return res.status(201).json({
-        success: true,
-        data: { token, user: { id: user._id, name: user.name, email: user.email, role: user.role } },
+      return res.status(503).json({
+        success: false,
+        message: 'MongoDB Atlas is disconnected. Please ensure your network has access to MongoDB Atlas (Port 27017).',
       });
     }
 
@@ -64,14 +59,9 @@ async function login(req, res, next) {
     if (!email || !password) throw new ApiError(400, 'email and password are required');
 
     if (!isConnected()) {
-      const user = await memoryStore.findUserByEmail(email);
-      if (!user) throw new ApiError(401, 'Invalid email or password');
-      const match = await user.comparePassword(password);
-      if (!match) throw new ApiError(401, 'Invalid email or password');
-      const token = signToken(user);
-      return res.json({
-        success: true,
-        data: { token, user: { id: user._id, name: user.name, email: user.email, role: user.role } },
+      return res.status(503).json({
+        success: false,
+        message: 'MongoDB Atlas is disconnected. Please ensure your network has access to MongoDB Atlas (Port 27017).',
       });
     }
 

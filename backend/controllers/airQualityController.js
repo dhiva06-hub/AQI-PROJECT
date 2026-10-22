@@ -2,7 +2,6 @@ const Station = require('../models/Station');
 const Measurement = require('../models/Measurement');
 const { ApiError } = require('../middleware/errorHandler');
 const { isConnected } = require('../config/db');
-const memoryStore = require('../services/inMemoryStore');
 const { searchLiveLocationAQI } = require('../services/externalAPIService');
 
 const RANGE_TO_MS = {
@@ -12,21 +11,21 @@ const RANGE_TO_MS = {
 };
 
 /**
- * Returns latest readings from the Measurement collection for recent measurements.
+ * Returns latest readings from the Measurement collection for stations.
  */
 async function latestByStation(stationIds) {
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const match = { sourceTimestamp: { $gte: since } };
+  const match = {};
   if (Array.isArray(stationIds) && stationIds.length > 0 && stationIds.length < 5000) {
     match.stationId = { $in: stationIds };
   }
 
-  const docs = await Measurement.aggregate([
-    { $match: match },
+  const pipeline = [
+    ...(Object.keys(match).length ? [{ $match: match }] : []),
     { $sort: { sourceTimestamp: -1 } },
     { $group: { _id: '$stationId', doc: { $first: '$$ROOT' } } },
-  ]).allowDiskUse(true);
+  ];
 
+  const docs = await Measurement.aggregate(pipeline).allowDiskUse(true);
   return new Map(docs.map((d) => [d._id, d.doc]));
 }
 
@@ -51,8 +50,10 @@ function clearAirQualityCache() {
 async function getCurrentAll(req, res, next) {
   try {
     if (!isConnected()) {
-      const results = memoryStore.getCurrentAll();
-      return res.json({ success: true, count: results.length, data: results });
+      return res.status(503).json({
+        success: false,
+        message: 'MongoDB Atlas is disconnected. Please ensure your network has access to MongoDB Atlas (Port 27017).',
+      });
     }
 
     const now = Date.now();
@@ -101,40 +102,10 @@ async function getCurrentAll(req, res, next) {
 async function getAvailableCities(req, res, next) {
   try {
     if (!isConnected()) {
-      const stations = memoryStore.getStations();
-      const currentAll = memoryStore.getCurrentAll();
-      const latestMap = new Map(currentAll.map((c) => [c.station.stationId, c.latest]));
-      const cityMap = new Map();
-      for (const st of stations) {
-        const cityName = st.city || 'Unknown';
-        if (!cityMap.has(cityName)) {
-          cityMap.set(cityName, {
-            city: cityName,
-            state: st.state || '',
-            country: st.country || '',
-            latitude: st.latitude,
-            longitude: st.longitude,
-            stationCount: 0,
-            latestAqi: null,
-            category: null,
-            pm25: null,
-            pm10: null,
-            sourceTimestamp: null,
-          });
-        }
-        const entry = cityMap.get(cityName);
-        entry.stationCount++;
-        const latest = latestMap.get(st.stationId) || st.latest;
-        if (latest && (entry.latestAqi === null || (latest.aqi !== null && latest.aqi > entry.latestAqi))) {
-          entry.latestAqi = latest.aqi;
-          entry.category = latest.category;
-          entry.pm25 = latest.pollutants?.pm25?.concentration ?? null;
-          entry.pm10 = latest.pollutants?.pm10?.concentration ?? null;
-          entry.sourceTimestamp = latest.timestamp;
-        }
-      }
-      const cities = Array.from(cityMap.values()).sort((a, b) => (b.latestAqi || 0) - (a.latestAqi || 0));
-      return res.json({ success: true, count: cities.length, data: cities });
+      return res.status(503).json({
+        success: false,
+        message: 'MongoDB Atlas is disconnected. Please ensure your network has access to MongoDB Atlas (Port 27017).',
+      });
     }
 
     const now = Date.now();
@@ -255,8 +226,10 @@ async function getCurrentByCity(req, res, next) {
     if (!city || !city.trim()) throw new ApiError(400, 'city parameter is required');
 
     if (!isConnected()) {
-      const results = memoryStore.getCurrentByCity(city);
-      return res.json({ success: true, count: results.length, data: results });
+      return res.status(503).json({
+        success: false,
+        message: 'MongoDB Atlas is disconnected. Please ensure your network has access to MongoDB Atlas (Port 27017).',
+      });
     }
 
     const stations = await Station.find({
@@ -299,10 +272,10 @@ async function getHistory(req, res, next) {
     const since = new Date(Date.now() - RANGE_TO_MS[range]);
 
     if (!isConnected()) {
-      const station = memoryStore.getStation(stationId);
-      if (!station) throw new ApiError(404, `Station "${stationId}" not found`);
-      const measurements = memoryStore.getHistory(stationId, since);
-      return res.json({ success: true, station, range, count: measurements.length, data: measurements });
+      return res.status(503).json({
+        success: false,
+        message: 'MongoDB Atlas is disconnected. Please ensure your network has access to MongoDB Atlas (Port 27017).',
+      });
     }
 
     const station = await Station.findOne({ stationId }).lean();

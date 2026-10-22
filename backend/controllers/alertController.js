@@ -59,7 +59,10 @@ async function syncRealStationAlerts() {
 async function listAlerts(req, res, next) {
   try {
     if (!isConnected()) {
-      return res.json({ success: true, count: 0, data: [] });
+      return res.status(503).json({
+        success: false,
+        message: 'MongoDB Atlas is disconnected. Please ensure your network has access to MongoDB Atlas (Port 27017).',
+      });
     }
 
     const { severity, stationId, acknowledged, limit = 100 } = req.query;

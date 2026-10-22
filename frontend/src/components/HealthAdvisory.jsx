@@ -2,7 +2,50 @@ import React from 'react';
 import { IconShieldCheck } from './Icons';
 import { levelOf, SCALES } from '../utils/aqiScale';
 
-export default function HealthAdvisory({ category = 'Good', aqi = 50, level, standard = 'CPCB' }) {
+export default function HealthAdvisory({ category, aqi, level, standard = 'CPCB' }) {
+  const hasData = aqi !== null && aqi !== undefined && category;
+
+  if (!hasData) {
+    return (
+      <div className="card">
+        <div className="card-header">
+          <div>
+            <h3 className="card-title">
+              <span className="card-icon-badge">
+                <IconShieldCheck size={16} />
+              </span>
+              <span>Health & Activity Guidance</span>
+            </h3>
+            <p className="card-subtitle">
+              Real-time environmental health precautions
+            </p>
+          </div>
+          <div className="badge badge-emerald" style={{ fontSize: '0.72rem' }}>
+            {(SCALES[standard] || SCALES.CPCB).name}
+          </div>
+        </div>
+        <div
+          style={{
+            background: 'var(--panel-2)',
+            padding: '24px',
+            borderRadius: 'var(--radius-sm)',
+            border: '1px solid var(--border)',
+            textAlign: 'center',
+            color: 'var(--text-muted)',
+            fontSize: '0.88rem',
+          }}
+        >
+          <p style={{ fontWeight: 600, color: 'var(--text-heading)', marginBottom: 4 }}>
+            Health recommendations pending
+          </p>
+          <p style={{ fontSize: '0.8rem' }}>
+            Select an active station with live pollutant measurements to display tailored medical and outdoor activity precautions.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const lvl = level || levelOf({ category }) || 1;
   const getAdvisories = () => {
     switch (lvl) {

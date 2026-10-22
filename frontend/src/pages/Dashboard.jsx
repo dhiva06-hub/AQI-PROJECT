@@ -407,10 +407,10 @@ export default function Dashboard() {
         )}
 
         <HealthAdvisory
-          category={activeLatest?.category || 'Good'}
+          category={activeLatest?.category}
           level={activeLatest?.level}
           standard={activeLatest?.standard}
-          aqi={activeLatest?.aqi || 50}
+          aqi={activeLatest?.aqi}
         />
       </section>
 

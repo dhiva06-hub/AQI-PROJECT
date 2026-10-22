@@ -3,7 +3,6 @@ const Measurement = require('../models/Measurement');
 const { ApiError } = require('../middleware/errorHandler');
 const { getIngestionStatus } = require('../jobs/aqiUpdater');
 const { isConnected } = require('../config/db');
-const memoryStore = require('../services/inMemoryStore');
 const { hasApiKey } = require('../services/externalAPIService');
 
 const CACHE_TTL_MS = 45 * 1000;
@@ -16,8 +15,10 @@ let stationsInFlight = null;
 async function listStations(req, res, next) {
   try {
     if (!isConnected()) {
-      const stations = memoryStore.getStations();
-      return res.json({ success: true, count: stations.length, data: stations });
+      return res.status(503).json({
+        success: false,
+        message: 'MongoDB Atlas is disconnected. Please ensure your network has access to MongoDB Atlas (Port 27017).',
+      });
     }
 
     const now = Date.now();
@@ -58,10 +59,10 @@ async function getStation(req, res, next) {
     const { id } = req.params;
 
     if (!isConnected()) {
-      const station = memoryStore.getStation(id);
-      if (!station) throw new ApiError(404, `Station "${id}" not found`);
-      const latest = memoryStore.getLatestMeasurement(station.stationId);
-      return res.json({ success: true, data: { station, latest: latest || null } });
+      return res.status(503).json({
+        success: false,
+        message: 'MongoDB Atlas is disconnected. Please ensure your network has access to MongoDB Atlas (Port 27017).',
+      });
     }
 
     const station =
@@ -88,9 +89,7 @@ async function getStation(req, res, next) {
  */
 async function getHealth(req, res, next) {
   try {
-    const stationCount = isConnected()
-      ? await Station.countDocuments()
-      : (process.env.NODE_ENV === 'test' ? memoryStore.getStations().length : 0);
+    const stationCount = isConnected() ? await Station.countDocuments() : 0;
 
     res.json({
       success: true,
@@ -98,7 +97,7 @@ async function getHealth(req, res, next) {
         dbConnected: isConnected(),
         dataSource: 'openaq',
         openaqKeyConfigured: hasApiKey(),
-        storageMode: isConnected() ? 'mongodb-atlas' : (process.env.NODE_ENV === 'test' ? 'in-memory-standalone' : 'disconnected'),
+        storageMode: isConnected() ? 'mongodb-atlas' : 'disconnected',
         stationCount,
         ingestion: getIngestionStatus(),
         uptimeSeconds: Math.round(process.uptime()),
