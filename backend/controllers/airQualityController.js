@@ -51,14 +51,8 @@ function clearAirQualityCache() {
 async function getCurrentAll(req, res, next) {
   try {
     if (!isConnected()) {
-      if (process.env.NODE_ENV === 'test') {
-        const results = memoryStore.getCurrentAll();
-        return res.json({ success: true, count: results.length, data: results });
-      }
-      return res.status(503).json({
-        success: false,
-        message: 'MongoDB Atlas is disconnected or initializing. Please retry in a moment.',
-      });
+      const results = memoryStore.getCurrentAll();
+      return res.json({ success: true, count: results.length, data: results });
     }
 
     const now = Date.now();
@@ -107,10 +101,40 @@ async function getCurrentAll(req, res, next) {
 async function getAvailableCities(req, res, next) {
   try {
     if (!isConnected()) {
-      return res.status(503).json({
-        success: false,
-        message: 'MongoDB Atlas is disconnected or initializing. Please retry in a moment.',
-      });
+      const stations = memoryStore.getStations();
+      const currentAll = memoryStore.getCurrentAll();
+      const latestMap = new Map(currentAll.map((c) => [c.station.stationId, c.latest]));
+      const cityMap = new Map();
+      for (const st of stations) {
+        const cityName = st.city || 'Unknown';
+        if (!cityMap.has(cityName)) {
+          cityMap.set(cityName, {
+            city: cityName,
+            state: st.state || '',
+            country: st.country || '',
+            latitude: st.latitude,
+            longitude: st.longitude,
+            stationCount: 0,
+            latestAqi: null,
+            category: null,
+            pm25: null,
+            pm10: null,
+            sourceTimestamp: null,
+          });
+        }
+        const entry = cityMap.get(cityName);
+        entry.stationCount++;
+        const latest = latestMap.get(st.stationId) || st.latest;
+        if (latest && (entry.latestAqi === null || (latest.aqi !== null && latest.aqi > entry.latestAqi))) {
+          entry.latestAqi = latest.aqi;
+          entry.category = latest.category;
+          entry.pm25 = latest.pollutants?.pm25?.concentration ?? null;
+          entry.pm10 = latest.pollutants?.pm10?.concentration ?? null;
+          entry.sourceTimestamp = latest.timestamp;
+        }
+      }
+      const cities = Array.from(cityMap.values()).sort((a, b) => (b.latestAqi || 0) - (a.latestAqi || 0));
+      return res.json({ success: true, count: cities.length, data: cities });
     }
 
     const now = Date.now();
@@ -231,14 +255,8 @@ async function getCurrentByCity(req, res, next) {
     if (!city || !city.trim()) throw new ApiError(400, 'city parameter is required');
 
     if (!isConnected()) {
-      if (process.env.NODE_ENV === 'test') {
-        const results = memoryStore.getCurrentByCity(city);
-        return res.json({ success: true, count: results.length, data: results });
-      }
-      return res.status(503).json({
-        success: false,
-        message: 'MongoDB Atlas is disconnected or initializing. Please retry in a moment.',
-      });
+      const results = memoryStore.getCurrentByCity(city);
+      return res.json({ success: true, count: results.length, data: results });
     }
 
     const stations = await Station.find({
@@ -281,16 +299,10 @@ async function getHistory(req, res, next) {
     const since = new Date(Date.now() - RANGE_TO_MS[range]);
 
     if (!isConnected()) {
-      if (process.env.NODE_ENV === 'test') {
-        const station = memoryStore.getStation(stationId);
-        if (!station) throw new ApiError(404, `Station "${stationId}" not found`);
-        const measurements = memoryStore.getHistory(stationId, since);
-        return res.json({ success: true, station, range, count: measurements.length, data: measurements });
-      }
-      return res.status(503).json({
-        success: false,
-        message: 'MongoDB Atlas is disconnected or initializing. Please retry in a moment.',
-      });
+      const station = memoryStore.getStation(stationId);
+      if (!station) throw new ApiError(404, `Station "${stationId}" not found`);
+      const measurements = memoryStore.getHistory(stationId, since);
+      return res.json({ success: true, station, range, count: measurements.length, data: measurements });
     }
 
     const station = await Station.findOne({ stationId }).lean();

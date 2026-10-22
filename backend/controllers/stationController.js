@@ -16,14 +16,8 @@ let stationsInFlight = null;
 async function listStations(req, res, next) {
   try {
     if (!isConnected()) {
-      if (process.env.NODE_ENV === 'test') {
-        const stations = memoryStore.getStations();
-        return res.json({ success: true, count: stations.length, data: stations });
-      }
-      return res.status(503).json({
-        success: false,
-        message: 'MongoDB Atlas is disconnected or initializing. Please retry in a moment.',
-      });
+      const stations = memoryStore.getStations();
+      return res.json({ success: true, count: stations.length, data: stations });
     }
 
     const now = Date.now();
@@ -64,16 +58,10 @@ async function getStation(req, res, next) {
     const { id } = req.params;
 
     if (!isConnected()) {
-      if (process.env.NODE_ENV === 'test') {
-        const station = memoryStore.getStation(id);
-        if (!station) throw new ApiError(404, `Station "${id}" not found`);
-        const latest = memoryStore.getLatestMeasurement(station.stationId);
-        return res.json({ success: true, data: { station, latest: latest || null } });
-      }
-      return res.status(503).json({
-        success: false,
-        message: 'MongoDB Atlas is disconnected or initializing. Please retry in a moment.',
-      });
+      const station = memoryStore.getStation(id);
+      if (!station) throw new ApiError(404, `Station "${id}" not found`);
+      const latest = memoryStore.getLatestMeasurement(station.stationId);
+      return res.json({ success: true, data: { station, latest: latest || null } });
     }
 
     const station =
