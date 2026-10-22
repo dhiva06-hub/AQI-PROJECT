@@ -1,0 +1,451 @@
+/* ==========================================================================
+   Single, Unified, Seamless Environmental Intelligence Login Page
+   Design: Full-Page Cinematic Atmospheric Background + Translucent Card
+   Theme: Deep Forest Green (#0e2a1d, #134e2f) + Luminous Emerald (#10b981) +
+          Warm Porcelain White (#faf8f5) + Earthy Brown Accents (#4a3728)
+   ========================================================================== */
+
+.unified-login-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 36px 24px 24px 24px;
+  background-image: url('/images/fullpage-bg.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: #201610;
+  overflow-x: hidden;
+  font-family: var(--font-sans, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
+}
+
+/* Atmospheric Environmental Vignette Overlay */
+.unified-login-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 20, 15, 0.76) 0%,
+    rgba(12, 26, 20, 0.82) 42%,
+    rgba(10, 19, 28, 0.94) 100%
+  );
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 1;
+}
+
+/* Subtle Ambient Emerald Glow in the Center */
+.unified-login-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(20, 184, 166, 0.04) 50%, transparent 70%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ==========================================================================
+   Center Content Composition
+   ========================================================================== */
+
+.unified-login-content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 480px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+}
+
+/* Header Branding Section (Above Card) */
+.unified-brand-header {
+  text-align: center;
+  margin-bottom: 22px;
+  width: 100%;
+}
+
+.unified-brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #ecfdf5;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  margin-bottom: 12px;
+}
+
+.pulse-indicator-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 10px #10b981, 0 0 14px rgba(16, 185, 129, 0.8);
+  animation: pulse-ring 2.2s infinite ease-in-out;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.unified-title {
+  font-size: 1.65rem;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.55);
+  margin-bottom: 6px;
+}
+
+.unified-title-highlight {
+  background: linear-gradient(135deg, #ffffff 30%, #a7f3d0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline;
+}
+
+.unified-tagline {
+  font-size: 0.88rem;
+  font-weight: 450;
+  color: #d1fae5;
+  line-height: 1.45;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   Translucent Floating Login Card
+   ========================================================================== */
+
+.unified-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 18px;
+  padding: 30px 32px;
+  box-shadow:
+    0 24px 64px -12px rgba(8, 20, 15, 0.45),
+    0 8px 24px -4px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(16, 185, 129, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.unified-card-header {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.unified-card-icon-badge {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #134e2f 0%, #0e2a1d 100%);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px auto;
+  color: #34d399;
+  box-shadow: 0 4px 14px rgba(19, 78, 47, 0.22);
+}
+
+.unified-portal-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.71rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.unified-card-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #201610;
+  letter-spacing: -0.025em;
+  margin-bottom: 4px;
+}
+
+.unified-card-subtitle {
+  font-size: 0.83rem;
+  color: #6b5544;
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   Form Fields & Controls
+   ========================================================================== */
+
+.unified-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.unified-field-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.unified-label {
+  font-size: 0.81rem;
+  font-weight: 600;
+  color: #382a1e;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.unified-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.unified-input-icon {
+  position: absolute;
+  left: 13px;
+  color: #7d6958;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.unified-input-wrapper:focus-within .unified-input-icon {
+  color: #10b981;
+}
+
+.unified-input {
+  width: 100%;
+  height: 44px;
+  padding: 10px 14px 10px 40px;
+  font-size: 0.88rem;
+  color: #201610;
+  background-color: #fbf9f6;
+  border: 1px solid #ddd2c4;
+  border-radius: 9px;
+  outline: none;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.unified-input:focus {
+  background-color: #ffffff;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.14);
+}
+
+.unified-input::placeholder {
+  color: #a49282;
+  font-size: 0.84rem;
+}
+
+.unified-password-toggle {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #7d6958;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.unified-password-toggle:hover {
+  color: #15803d;
+}
+
+/* Submit Button */
+.unified-submit-btn {
+  margin-top: 4px;
+  height: 44px;
+  padding: 0 18px;
+  background: linear-gradient(135deg, #134e2f 0%, #0d3822 100%);
+  color: #ffffff;
+  border: 1px solid #0a2c1b;
+  border-radius: 9px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(19, 78, 47, 0.24);
+}
+
+.unified-submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #175d38 0%, #10442a 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -3px rgba(19, 78, 47, 0.34);
+}
+
+.unified-submit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Quick Demo Button */
+.unified-demo-btn {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #0e2a1d !important;
+  border: 1px solid #c9d8ce !important;
+  border-radius: 9px;
+  height: 38px;
+  padding: 0 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  box-shadow: 0 1px 4px rgba(14, 42, 29, 0.08) !important;
+  transition: all 0.18s ease;
+}
+
+.unified-demo-btn:hover {
+  background: #f4fbf7 !important;
+  background-image: none !important;
+  border-color: #10b981 !important;
+  color: #081a12 !important;
+  box-shadow: 0 3px 10px rgba(16, 185, 129, 0.18) !important;
+  transform: translateY(-1px);
+}
+
+/* Mode Switcher Link */
+.unified-mode-switch {
+  text-align: center;
+  margin-top: 4px;
+}
+
+.unified-mode-btn {
+  background: transparent;
+  color: #059669;
+  font-weight: 600;
+  font-size: 0.83rem;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.15s ease;
+}
+
+.unified-mode-btn:hover {
+  color: #047857;
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   Minimal Unified Footer (Single Line at Base)
+   ========================================================================== */
+
+.unified-footer {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px 0 6px 0;
+  font-size: 0.76rem;
+  color: #cbd5e1;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.unified-footer span {
+  opacity: 0.9;
+}
+
+.unified-footer-sep {
+  opacity: 0.5;
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .unified-login-page {
+    padding: 24px 16px 16px 16px;
+    background-attachment: scroll;
+  }
+
+  .unified-title {
+    font-size: 1.4rem;
+  }
+
+  .unified-tagline {
+    font-size: 0.82rem;
+    margin-bottom: 18px;
+  }
+
+  .unified-card {
+    padding: 24px 20px;
+    border-radius: 14px;
+  }
+
+  .unified-card-title {
+    font-size: 1.3rem;
+  }
+
+  .unified-footer {
+    font-size: 0.72rem;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .unified-footer-sep {
+    display: none;
+  }
+}
